@@ -1,0 +1,34 @@
+name: Dependency Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Install OWASP Dependency-Check
+      - name: Install OWASP Dependency-Check
+        run: |
+          wget https://github.com/jeremylong/DependencyCheck/releases/download/v<latest_version>/dependency-check.sh
+          chmod +x dependency-check.sh
+
+      # Run OWASP Dependency-Check
+      - name: Run Dependency Check
+        run: |
+          ./dependency-check.sh --project "." --out ./reports --scan .
+
+      # Upload the report as an artifact
+      - name: Upload Dependency Check Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: dependency-check-report
+          path: ./reports/*
